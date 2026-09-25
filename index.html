@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Perfil Comercial</title>
+    <style>
+        :root {
+            --dark-blue: #0A192F;
+            --blue: #172A45;
+            --light-blue: #303C55;
+            --gray: #8892B0;
+            --light-gray: #CCD6F6;
+            --white: #FFFFFF;
+            --bg-body: #f0f2f5;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            display: flex;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+
+        .app-container {
+            width: 100%;
+            max-width: 480px;
+            background-color: var(--white);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow-x: hidden;
+            transition: filter 0.3s;
+        }
+
+        .negative-mode {
+            filter: invert(1) hue-rotate(180deg);
+        }
+        .negative-mode .profile-pic,
+        .negative-mode .grid-item,
+        .negative-mode .post-image-preview {
+            filter: invert(1) hue-rotate(180deg);
+        }
+
+        .btn-beveled {
+            background-color: var(--blue);
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 
+                inset 2px 2px 3px rgba(255, 255, 255, 0.3), 
+                inset -2px -2px 3px rgba(0, 0, 0, 0.5), 
+                2px 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+        }
+
+        .btn-beveled:active {
+            box-shadow: 
+                inset 2px 2px 3px rgba(0, 0, 0, 0.5), 
+                inset -2px -2px 3px rgba(255, 255, 255, 0.2);
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 20px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+
+        .profile-pic {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background-color: var(--gray);
+            border: 2px solid var(--dark-blue);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--white);
+            font-size: 24px;
+            font-weight: bold;
+            flex-shrink: 0;
+            background-image: url('https://via.placeholder.com/80/172A45/FFFFFF?text=CR');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .stats-container {
+            display: flex;
+            flex-grow: 1;
+            justify-content: space-around;
+            text-align: center;
+            padding-right: 10px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: var(--dark-blue);
+        }
+
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--gray);
+        }
+
+        .menu-icon {
+            width: 20px;
+            height: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 3px;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        
+        .menu-icon div {
+            background-color: var(--dark-blue);
+            border-radius: 2px;
+        }
+
+        .profile-info {
+            padding: 10px 15px;
+        }
+
+        .profile-name {
+            font-weight: bold;
+            font-size: 1rem;
+            color: var(--dark-blue);
+        }
+
+        .profile-bio {
+            font-size: 0.85rem;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            padding: 0 15px;
+        }
+
+        .btn-full {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .categories-scroll {
+            display: flex;
+            overflow-x: auto;
+            padding: 15px;
+            gap: 15px;
+            scrollbar-width: none;
+        }
+        
+        .categories-scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .category-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: var(--light-gray);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: var(--dark-blue);
+            box-shadow: 
+                inset 3px 3px 5px rgba(255, 255, 255, 0.7), 
+                inset -3px -3px 5px rgba(0, 0, 0, 0.2), 
+                3px 3px 5px rgba(0,0,0,0.1);
+            border: 2px solid var(--white);
+        }
+
+        .category-name {
+            font-size: 0.7rem;
+            color: var(--dark-blue);
+            font-weight: 600;
+        }
+
+        /* GRID DE FEED */
+        .grid-feed {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            padding-bottom: 20px;
+        }
+
+        .grid-item {
+            aspect-ratio: 1 / 1;
+            background-color: var(--gray);
+            cursor: pointer;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 25, 47, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--white);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .modal-title {
+            color: var(--dark-blue);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+            padding-bottom: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--blue);
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--gray);
+            border-radius: 5px;
+        }
+
+        .options-section {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+        }
+
+        .input-group-btn {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .input-group-btn input {
+            flex-grow: 1;
+        }
+
+        .post-image-preview {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background-color: var(--light-gray);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .post-description-text {
+            font-size: 0.9rem;
+            color: #444;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .comment-section {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .comment-input {
+            flex-grow: 1;
+            padding: 8px;
+            border: 1px solid var(--gray);
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        .pago-movil-display p {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            color: var(--dark-blue);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container" id="appContainer">
+        <!-- HEADER / PERFIL -->
+        <div class="header">
+            <div class="profile-pic" id="displayProfilePic"></div>
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-number" id="postCount">6</span>
+                    <span class="stat-label">Posts</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">1.2K</span>
+                    <span class="stat-label">Vistas</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">340</span>
+                    <span class="stat-label">Clientes</span>
+                </div>
+            </div>
+            <!-- Botón de Opciones (4 puntos) -->
+            <div class="menu-icon" onclick="openOptionsModal()">
+                <div></div><div></div><div></div><div></div>
+            </div>
+        </div>
+
+        <div class="profile-info">
+            <div class="profile-name" id="displayProfileName">César Ramírez</div>
+            <div class="profile-bio"><span id="displayInstagram">@cesar_roficial</span><br>Desarrollo web, educación, herramientas y más.</div>
+        </div>
+
+        <div class="header-actions">
+            <button class="btn-beveled btn-full" onclick="shareProfile()">COMPARTIR</button>
+            <button class="btn-beveled btn-full" onclick="openNewPostModal()">+ NUEVA PUBLICACIÓN</button>
+        </div>
+
+        <!-- CATEGORIAS -->
+        <div class="categories-scroll">
+            <div class="category-item">
+                <div class="category-circle">💰</div>
+                <span class="category-name">FINANZAS</span>
+            </div>
+            <div class="category-item">
+                <div class="category-circle">🎮</div>
+                <span class="category-name">JUEGOS</span>
+            </div>
+            <div class="category-item">
+                <div class="category-circle">📚</div>
+                <span class="category-name">EDUCACIÓN</span>
+            </div>
+            <div class="category-item">
+                <div class="category-circle">🛠️</div>
+                <span class="category-name">HERRAMIENTAS</span>
+            </div>
+            <div class="category-item">
+                <div class="category-circle">🌐</div>
+                <span class="category-name">PÁGINAS WEB</span>
+            </div>
+            <div class="category-item">
+                <div class="category-circle">🎨</div>
+                <span class="category-name">DISEÑO GRÁFICO</span>
+            </div>
+            <div class="category-item">
+                <div class="category-circle">📄</div>
+                <span class="category-name">CURRÍCULUM</span>
+            </div>
+        </div>
+
+        <!-- FEED 3x3 -->
+        <div class="grid-feed" id="feedContainer">
+            <!-- Los posts iniciales de demostración se cargan vía JavaScript para usar la misma función -->
+        </div>
+    </div>
+
+    <!-- MODAL OPCIONES -->
+    <div class="modal-overlay" id="optionsModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('optionsModal')">&times;</span>
+            <h3 class="modal-title">Opciones</h3>
+            
+            <div class="options-section">
+                <div class="form-group">
+                    <label>Editar Nombre</label>
+                    <input type="text" id="inputName" class="form-control" value="César Ramírez">
+                </div>
+                <div class="form-group">
+                    <label>Cambiar Foto de Perfil</label>
+                    <input type="file" id="inputPhoto" class="form-control" accept="image/*" onchange="previewProfilePic(event)">
+                </div>
+            </div>
+
+            <div class="options-section">
+                <h4 style="margin-bottom: 10px; color: var(--dark-blue); font-size: 0.95rem;">Datos de Pago Móvil</h4>
+                <div class="form-group">
+                    <label>Banco</label>
+                    <input type="text" id="inputBank" class="form-control" placeholder="Ej: Banesco">
+                </div>
+                <div class="form-group">
+                    <label>Cédula / RIF</label>
+                    <input type="text" id="inputIdCard" class="form-control" placeholder="Ej: V-12345678">
+                </div>
+                <div class="form-group">
+                    <label>Teléfono</label>
+                    <input type="number" id="inputPmPhone" class="form-control" placeholder="Ej: 04120000000">
+                </div>
+            </div>
+
+            <div class="options-section">
+                <div class="form-group">
+                    <label>Número de WhatsApp (Ej: 584120000000)</label>
+                    <div class="input-group-btn">
+                        <input type="number" id="inputWa" class="form-control" placeholder="Código + Número">
+                        <button class="btn-beveled" onclick="openWhatsApp()">Ir</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Usuario de Instagram</label>
+                    <div class="input-group-btn">
+                        <input type="text" id="inputIg" class="form-control" value="cesar_roficial">
+                        <button class="btn-beveled" onclick="openInstagram()">Ir</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="options-section">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Configuración de Colores</label>
+                    <button class="btn-beveled" style="width: 100%; margin-top: 5px;" id="themeToggleBtn" onclick="toggleTheme()">Cambiar a Modo Negativo</button>
+                </div>
+            </div>
+            
+            <button class="btn-beveled" style="width: 100%; margin-top: 10px;" onclick="saveProfileInfo()">Guardar Todos los Cambios</button>
+        </div>
+    </div>
+
+    <!-- MODAL NUEVA PUBLICACIÓN -->
+    <div class="modal-overlay" id="newPostModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('newPostModal')">&times;</span>
+            <h3 class="modal-title">Nueva Publicación</h3>
+            
+            <div class="form-group">
+                <label>Título de la Publicación</label>
+                <input type="text" id="newPostTitle" class="form-control" placeholder="Ej: Curso de React">
+            </div>
+
+            <div class="form-group">
+                <label>Foto del Feed</label>
+                <input type="file" id="newPostImage" class="form-control" accept="image/*">
+            </div>
+            
+            <div class="form-group">
+                <label>Archivo Adjunto (MP3, WAV, ZIP, RAR, Fotos, Videos)</label>
+                <input type="file" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>Descripción / Texto</label>
+                <textarea id="newPostDesc" class="form-control" rows="2" placeholder="Escribe algo sobre este producto..."></textarea>
+            </div>
+
+            <div class="form-group" style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" id="isFree" style="width: 20px; height: 20px;" onchange="togglePriceInput()">
+                <label for="isFree" style="margin: 0;">OPCIÓN GRATIS</label>
+            </div>
+
+            <div class="form-group" id="priceGroup">
+                <label>Precio ($)</label>
+                <input type="number" id="newPostPrice" class="form-control" placeholder="Ej: 5.00" step="0.01">
+            </div>
+
+            <button class="btn-beveled" style="width: 100%; margin-top: 10px;" onclick="publishPost()">PUBLICAR EN EL FEED</button>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE DE PUBLICACIÓN -->
+    <div class="modal-overlay" id="postDetailModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('postDetailModal')">&times;</span>
+            <h3 class="modal-title" id="postTitle">Título del Post</h3>
+            
+            <div class="post-image-preview" id="postImageDisplay"></div>
+            
+            <div class="post-description-text" id="postDescription"></div>
+
+            <div class="post-actions">
+                <button class="btn-beveled" style="flex: 1;" onclick="toggleLike(this)">🤍 LIKE</button>
+                <button class="btn-beveled" style="flex: 1;" id="buyBtn">COMPRAR</button>
+                <button class="btn-beveled" style="flex: 1;" onclick="promptDownload()">⬇️ DESCARGAR</button>
+            </div>
+
+            <div class="comment-section">
+                <input type="text" class="comment-input" placeholder="Deja un comentario...">
+                <button class="btn-beveled">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DATOS DE COMPRA (PAGO MÓVIL) -->
+    <div class="modal-overlay" id="buyModal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('buyModal')">&times;</span>
+            <h3 class="modal-title">Realizar Pago</h3>
+            <p style="margin-bottom: 15px; font-size: 0.9rem; color: #555;">Para procesar tu compra, transfiere el monto a los siguientes datos de Pago Móvil:</p>
+            
+            <div class="options-section pago-movil-display" style="background-color: #f1f8ff; border-color: #cce5ff;">
+                <p><strong>Banco:</strong> <span id="displayBank">No configurado</span></p>
+                <p><strong>Cédula:</strong> <span id="displayIdCard">No configurado</span></p>
+                <p><strong>Teléfono:</strong> <span id="displayPmPhone">No configurado</span></p>
+            </div>
+            
+            <p style="margin-bottom: 15px; font-size: 0.85rem; color: #777;">Una vez realizado el pago, envía el comprobante al administrador para recibir la contraseña de descarga.</p>
+
+            <button class="btn-beveled" style="width: 100%;" onclick="closeModal('buyModal')">ENTENDIDO</button>
+        </div>
+    </div>
+
+    <script type="module">
+    // 1. Importar Firebase Core y Firestore
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+    import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-firestore.js";
+
+    // 2. Tu configuración de Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyCad07HqRigjS_DR_iyCdCqQ4d2MoJVLGM",
+        authDomain: "ramosistem-84b3b.firebaseapp.com",
+        projectId: "ramosistem-84b3b",
+        storageBucket: "ramosistem-84b3b.firebasestorage.app",
+        messagingSenderId: "963647428515",
+        appId: "1:963647428515:web:ed93c62b122e5b18ad6c16",
+        measurementId: "G-GG223EYGLK"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Variables Globales
+    let totalPosts = 0;
+    let pmData = { bank: '', id: '', phone: '' };
+    let currentProfilePic = "";
+
+    // 3. Cargar datos al iniciar la página
+    window.onload = async function() {
+        // Cargar perfil
+        const perfilRef = doc(db, "perfil", "datosPrincipales");
+        const perfilSnap = await getDoc(perfilRef);
+        
+        if (perfilSnap.exists()) {
+            const data = perfilSnap.data();
+            document.getElementById('displayProfileName').innerText = data.nombre || "César Ramírez";
+            document.getElementById('displayInstagram').innerText = data.instagram || "@cesar_roficial";
+            
+            if (data.foto) {
+                document.getElementById('displayProfilePic').style.backgroundImage = `url(${data.foto})`;
+                document.getElementById('displayProfilePic').innerText = ""; 
+                currentProfilePic = data.foto;
+            }
+            
+            pmData = data.pmData || { bank: '', id: '', phone: '' };
+            
+            // Llenar inputs de opciones con los datos de la base de datos
+            document.getElementById('inputName').value = data.nombre || "César Ramírez";
+            document.getElementById('inputIg').value = data.instagram ? data.instagram.replace('@', '') : "cesar_roficial";
+            document.getElementById('inputBank').value = pmData.bank;
+            document.getElementById('inputIdCard').value = pmData.id;
+            document.getElementById('inputPmPhone').value = pmData.phone;
+        }
+
+        // Cargar publicaciones del feed
+        const querySnapshot = await getDocs(collection(db, "publicaciones"));
+        document.getElementById('feedContainer').innerHTML = ''; // Limpia el contenedor
+        totalPosts = 0;
+        
+        querySnapshot.forEach((documento) => {
+            const post = documento.data();
+            addPostToFeedDOM(post.title, post.price, post.imgUrl, post.desc);
+        });
+        
+        // Si no hay posts en Firebase, puedes cargar los de demo aquí si lo deseas
+    };
+
+    // 4. Guardar Perfil en Firebase
+    window.saveProfileInfo = async function() {
+        const newName = document.getElementById('inputName').value;
+        let newIg = document.getElementById('inputIg').value;
+        const formattedIg = newIg.startsWith('@') ? newIg : '@' + newIg;
+
+        pmData.bank = document.getElementById('inputBank').value;
+        pmData.id = document.getElementById('inputIdCard').value;
+        pmData.phone = document.getElementById('inputPmPhone').value;
+
+        // Guardar en Firestore
+        await setDoc(doc(db, "perfil", "datosPrincipales"), {
+            nombre: newName,
+            instagram: formattedIg,
+            foto: currentProfilePic,
+            pmData: pmData
+        });
+
+        // Actualizar vista
+        document.getElementById('displayProfileName').innerText = newName;
+        document.getElementById('displayInstagram').innerText = formattedIg;
+        if(currentProfilePic) {
+            document.getElementById('displayProfilePic').style.backgroundImage = `url(${currentProfilePic})`;
+            document.getElementById('displayProfilePic').innerText = ""; 
+        }
+
+        alert("Cambios guardados en la nube correctamente.");
+        window.closeModal('optionsModal');
+    };
+
+    // 5. Guardar Nueva Publicación en Firebase
+    window.publishPost = async function() {
+        const title = document.getElementById('newPostTitle').value || 'Nueva Publicación';
+        const desc = document.getElementById('newPostDesc').value || 'Sin descripción...';
+        const isFree = document.getElementById('isFree').checked;
+        let price = isFree ? 'Gratis' : (document.getElementById('newPostPrice').value || '0.00');
+        const fileInput = document.getElementById('newPostImage');
+        
+        let imgUrlToSave = `https://via.placeholder.com/300/172A45/FFFFFF?text=${encodeURIComponent(title.substring(0,10))}`;
+
+        const saveToDb = async (finalImgUrl) => {
+            await addDoc(collection(db, "publicaciones"), {
+                title: title,
+                price: price,
+                imgUrl: finalImgUrl,
+                desc: desc,
+                timestamp: new Date()
+            });
+            addPostToFeedDOM(title, price, finalImgUrl, desc);
+            window.closeModal('newPostModal');
+            
+            // Limpiar
+            document.getElementById('newPostTitle').value = '';
+            document.getElementById('newPostPrice').value = '';
+            document.getElementById('newPostDesc').value = '';
+            document.getElementById('newPostImage').value = '';
+            document.getElementById('isFree').checked = false;
+            window.togglePriceInput();
+        };
+
+        if (fileInput.files && fileInput.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                saveToDb(e.target.result); // Guarda la imagen como texto base64 (Ideal solo para imágenes comprimidas)
+            }
+            reader.readAsDataURL(fileInput.files[0]);
+        } else {
+            saveToDb(imgUrlToSave);
+        }
+    };
+
+    // --- FUNCIONES INTERNAS Y DE LA INTERFAZ ---
+    
+    function addPostToFeedDOM(title, price, imgUrl, desc) {
+        const feed = document.getElementById('feedContainer');
+        const newItem = document.createElement('div');
+        newItem.className = 'grid-item';
+        newItem.style.backgroundImage = `url('${imgUrl}')`;
+        newItem.onclick = function() { window.openPostDetail(title, price, imgUrl, desc); };
+        feed.insertBefore(newItem, feed.firstChild);
+        totalPosts++;
+        document.getElementById('postCount').innerText = totalPosts;
+    }
+
+    // Funciones del Modal y UI expuestas a window
+    window.togglePriceInput = function() {
+        const isFree = document.getElementById('isFree').checked;
+        document.getElementById('priceGroup').style.display = isFree ? 'none' : 'block';
+    };
+
+    window.openPostDetail = function(title, price, imgUrl, desc) {
+        document.getElementById('postTitle').innerText = title;
+        document.getElementById('postDescription').innerText = desc;
+        document.getElementById('postImageDisplay').style.backgroundImage = `url('${imgUrl}')`;
+        const buyBtn = document.getElementById('buyBtn');
+        if(price === 'Gratis') {
+            buyBtn.innerText = 'GRATIS';
+            buyBtn.style.backgroundColor = '#4CAF50';
+            buyBtn.onclick = function() { alert("Este producto es gratis, puedes proceder a descargarlo directamente."); };
+        } else {
+            buyBtn.innerText = 'COMPRAR $' + price;
+            buyBtn.style.backgroundColor = 'var(--blue)';
+            buyBtn.onclick = function() { window.showBuyModal(); };
+        }
+        document.getElementById('postDetailModal').style.display = 'flex';
+    };
+
+    window.showBuyModal = function() {
+        document.getElementById('displayBank').innerText = pmData.bank || "No configurado";
+        document.getElementById('displayIdCard').innerText = pmData.id || "No configurado";
+        document.getElementById('displayPmPhone').innerText = pmData.phone || "No configurado";
+        document.getElementById('buyModal').style.display = 'flex';
+    };
+
+    window.openOptionsModal = function() { document.getElementById('optionsModal').style.display = 'flex'; };
+    window.openNewPostModal = function() { document.getElementById('newPostModal').style.display = 'flex'; };
+    window.closeModal = function(modalId) { document.getElementById(modalId).style.display = 'none'; };
+    
+    window.previewProfilePic = function(event) {
+        const reader = new FileReader();
+        reader.onload = function() { currentProfilePic = reader.result; }
+        if(event.target.files[0]) reader.readAsDataURL(event.target.files[0]);
+    };
+
+    window.openWhatsApp = function() {
+        const waNumber = document.getElementById('inputWa').value;
+        if(waNumber) window.open(`https://wa.me/${waNumber}`, '_blank');
+        else alert("Por favor ingresa un número de WhatsApp");
+    };
+
+    window.openInstagram = function() {
+        const igUser = document.getElementById('inputIg').value.replace('@', '');
+        if(igUser) window.open(`https://instagram.com/${igUser}`, '_blank');
+    };
+
+    window.shareProfile = function() {
+        if (navigator.share) {
+            navigator.share({ title: 'Perfil Comercial', text: '¡Mira este perfil y sus productos!', url: window.location.href }).catch(console.error);
+        } else {
+            alert('Copia el enlace de tu navegador manualmente.');
+        }
+    };
+
+    let isNegative = false;
+    window.toggleTheme = function() {
+        const container = document.getElementById('appContainer');
+        const btn = document.getElementById('themeToggleBtn');
+        isNegative = !isNegative;
+        if(isNegative) {
+            container.classList.add('negative-mode');
+            document.body.style.backgroundColor = '#0f0d0a';
+            btn.innerText = 'Cambiar a Modo Normal';
+        } else {
+            container.classList.remove('negative-mode');
+            document.body.style.backgroundColor = 'var(--bg-body)';
+            btn.innerText = 'Cambiar a Modo Negativo';
+        }
+    };
+
+    window.toggleLike = function(btn) {
+        if(btn.innerText.includes('🤍')) {
+            btn.innerText = '❤️ LIKED';
+            btn.style.color = '#ff4d4d';
+        } else {
+            btn.innerText = '🤍 LIKE';
+            btn.style.color = 'var(--white)';
+        }
+    };
+
+    window.promptDownload = function() {
+        const password = prompt("Para descargar, ingresa la contraseña:");
+        if (password === "admin123") alert("¡Contraseña correcta! Iniciando descarga...");
+        else if (password !== null) alert("Contraseña incorrecta. Acceso denegado.");
+    };
+
+    // Cerrar modales tocando afuera
+    window.onclick = function(event) {
+        const modals = ['newPostModal', 'postDetailModal', 'optionsModal', 'buyModal'];
+        modals.forEach(id => {
+            const el = document.getElementById(id);
+            if (event.target == el) el.style.display = "none";
+        });
+    };
+</script>
+</body>
+</html>
